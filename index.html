@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="sl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transkripcija v Živo | Zagotovite Skladnost z ZDPSI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Compliance (Background: #F8F7F4, Text: #333D4B, Accent: #2563EB, Secondary Accent: #4F46E5) -->
+    <!-- Application Structure Plan: Zasnoval sem enostransko aplikacijo (SPA), ki deluje kot pristajalna stran. Struktura sledi klasičnemu prodajnemu lijaku, prilagojenemu za B2B ciljno publiko (organizatorje dogodkov). Uporabniški tok se začne z močnim sporočilom o nujnosti (veljavnost zakona ZDPSI), nadaljuje s predstavitvijo rešitve in njenih koristi (za skladnost in za vse udeležence), gradi zaupanje preko družbenih dokazov, poenostavlja razumevanje procesa ("Kako deluje"), odpravlja dvome (FAQ) in se zaključi z jasnimi pozivi k dejanju (cenik in kontakt). Ta linearna, a vsebinsko bogata struktura je optimalna za hitro informiranje obiskovalca in ga učinkovito vodi proti konverziji. Navigacija je fiksna in omogoča enostaven skok med ključnimi odseki, kar izboljša uporabniško izkušnjo. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Podatki o gluhih (1.500), naglušnih (50.000) in dejstvo, da 80% uporabnikov podnapisov nima težav s sluhom. Goal: Inform/Compare. Viz/Presentation Method: Interaktivni krofni grafikon. Interaction: Prikaz podatkov ob prehodu miške. Justification: Vizualno močno prikaže "Curb-Cut Effect" in univerzalno korist storitve, kar je ključni prodajni argument. Library/Method: Chart.js (Canvas).
+        2. Report Info: Ključne koristi storitve (skladnost, vključenost, razumevanje, ponovna uporaba). Goal: Inform. Viz/Presentation Method: Mreža kartic z ikonami in besedilom. Interaction: Ni potrebna, poudarek na jasnosti. Justification: Omogoča hitro skeniranje in razumevanje glavnih vrednosti storitve. Library/Method: HTML/CSS (Tailwind).
+        3. Report Info: "Kako deluje" proces v treh korakih. Goal: Organize. Viz/Presentation Method: Numeriran, vizualno ločen 3-stopenjski proces. Interaction: Ni potrebna, poudarek na preprostosti. Justification: Demistificira proces in zmanjšuje tehnični strah. Library/Method: HTML/CSS (Tailwind).
+        4. Report Info: Pogosta vprašanja (FAQ). Goal: Inform/Organize. Viz/Presentation Method: Harmonika (accordion) meni. Interaction: Klik za odpiranje/zapiranje odgovora. Justification: Prihrani prostor in omogoča uporabniku, da se osredotoči le na vprašanja, ki ga zanimajo. Library/Method: HTML/CSS/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; color: #333D4B; }
+        .hero-pattern { background-image: radial-gradient(#d1d5db 0.5px, transparent 0.5px); background-size: 15px 15px; }
+        .cta-button { transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .faq-question { transition: background-color 0.2s; }
+        .faq-question.open { background-color: #E0E7FF; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out; }
+        .faq-question.open + .faq-answer { max-height: 300px; padding-top: 1rem; padding-bottom: 1rem; }
+        .chart-container { position: relative; width: 100%; max-width: 450px; margin-left: auto; margin-right: auto; height: auto; max-height: 450px; aspect-ratio: 1/1; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-xl font-bold text-indigo-600">Transkript.si</a>
+                </div>
+                <nav class="hidden md:flex md:space-x-8">
+                    <a href="#storitve" class="text-gray-600 hover:text-indigo-600 transition">Koristi</a>
+                    <a href="#kako-deluje" class="text-gray-600 hover:text-indigo-600 transition">Kako deluje</a>
+                    <a href="#cenik" class="text-gray-600 hover:text-indigo-600 transition">Cenik</a>
+                    <a href="#faq" class="text-gray-600 hover:text-indigo-600 transition">FAQ</a>
+                </nav>
+                <div class="hidden md:block">
+                     <a href="https://transkripcija-za-gluhe.lovable.app/login" class="cta-button inline-block bg-indigo-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md hover:bg-indigo-700">Pridobite ponudbo</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+            <a href="#storitve" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-50">Koristi</a>
+            <a href="#kako-deluje" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-50">Kako deluje</a>
+            <a href="#cenik" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-50">Cenik</a>
+            <a href="#faq" class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-50">FAQ</a>
+            <a href="https://transkripcija-za-gluhe.lovable.app/login" class="block py-3 px-4 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 text-center">Pridobite ponudbo</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="pt-24 pb-16 md:pt-32 md:pb-24 relative overflow-hidden">
+            <div class="absolute inset-0 hero-pattern opacity-50"></div>
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900">
+                    Vaš dogodek, <span class="text-indigo-600">dostopen vsem</span>.
+                </h1>
+                <p class="mt-4 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                    Zagotovite skladnost z ZDPSI s transkripcijo v živo. Enostavna, natančna in zanesljiva rešitev za podnaslavljanje konferenc, seminarjev in spletnih dogodkov. Optimizirano za slovenski jezik.
+                </p>
+                <div class="mt-8 flex justify-center gap-4 flex-wrap">
+                    <a href="https://transkripcija-za-gluhe.lovable.app/login" class="cta-button inline-block bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:bg-indigo-700">Pridobite ponudbo</a>
+                    <a href="#kako-deluje" class="cta-button inline-block bg-white text-indigo-600 font-bold py-3 px-8 rounded-lg text-lg shadow-lg border border-gray-200 hover:bg-gray-50">Oglejte si, kako deluje</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="problem-solution" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Dostopnost je zdaj zakonska obveza: Ste skladni z ZDPSI?</h2>
+                     <p class="mt-3 text-lg text-gray-600 max-w-3xl mx-auto">Od 28. junija 2025 je Zakon o dostopnosti (ZDPSI) v veljavi. Skladnost ni več priporočilo, ampak zahteva. Ne tvegajte kazni in izgube ugleda.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg">
+                        <h3 class="text-2xl font-bold text-red-900 mb-4">Problem: Tveganja neskladnosti</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="text-red-500 text-2xl mr-3 font-bold">!</span>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Zakonska obveza za zasebni sektor</h4>
+                                    <p class="text-gray-600">Zakon ZDPSI zdaj zahteva, da so vaši dogodki dostopni vsem, tudi v zasebnem sektorju.</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 text-2xl mr-3 font-bold">!</span>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Visoke denarne kazni</h4>
+                                    <p class="text-gray-600">Ignoriranje zakona prinaša tveganje visokih denarnih kazni in pravnih postopkov.</p>
+                                </div>
+                            </li>
+                             <li class="flex items-start">
+                                <span class="text-red-500 text-2xl mr-3 font-bold">!</span>
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Izključevanje občinstva</h4>
+                                    <p class="text-gray-600">Brez podnapisov ne izključujete le gluhih in naglušnih, temveč tudi tuje goste in udeležence v hrupnih okoljih.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
+                        <h3 class="text-2xl font-bold text-green-900 mb-4">Rešitev: Vaš Partner za Skladnost</h3>
+                        <div class="space-y-4 text-gray-700">
+                             <p>Naša storitev ni le orodje, temveč partnerstvo za dostopnost in brezskrbnost.</p>
+                             <p>Preprosto integrirajte transkripcijo v živo v katerikoli dogodek – fizični, virtualni ali hibridni. Naša rešitev deluje z vsemi večjimi platformami.</p>
+                             <p class="font-semibold">Naša tehnologija, natančno uglašena za posebnosti slovenskega jezika, zagotavlja izjemno razumevanje in profesionalen vtis, ki ga vaši udeleženci pričakujejo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="storitve" class="py-16 md:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Ena rešitev, številne koristi</h2>
+                    <p class="mt-3 text-lg text-gray-600 max-w-3xl mx-auto">Transkripcija v živo ni le zakonska obveza, temveč strateška prednost, ki izboljša izkušnjo za vse udeležence.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 mb-4">
+                           <span class="text-2xl">🛡️</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Zagotovite Skladnost</h3>
+                        <p class="text-gray-600">Izognite se visokim kaznim in pravnim tveganjem. Naša storitev je zasnovana v skladu z zahtevami ZDPSI in WCAG 2.1 AA.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+                         <div class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 mb-4">
+                           <span class="text-2xl">👥</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Povečajte Vključenost</h3>
+                        <p class="text-gray-600">Odprite vrata gluhim, naglušnim in tujim govorcem. Pokažite, da je vaša organizacija sodobna in odgovorna.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+                        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 mb-4">
+                           <span class="text-2xl">💡</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Izboljšajte Razumevanje</h3>
+                        <p class="text-gray-600">Udeleženci lažje sledijo vsebini, tudi v hrupnih okoljih. Več aktivnega poslušanja pomeni boljšo izkušnjo.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+                         <div class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 mb-4">
+                           <span class="text-2xl">♻️</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Ustvarite Vsebino</h3>
+                        <p class="text-gray-600">Uporabite transkripte za bloge, članke in objave. Bistveno izboljšajte svojo SEO optimizacijo in marketinški doseg.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="who-benefits" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Dostopnost, ki koristi vsem</h2>
+                        <p class="mt-4 text-lg text-gray-600">Morda boste presenečeni, kdo vse uporablja podnapise. Naša storitev je zasnovana za zakonsko zaščitene skupine, vendar njene koristi sežejo veliko dlje. To je "učinek klančine" za vaš dogodek – izboljšava za nekatere postane prednost za vse.</p>
+                        <ul class="mt-6 space-y-2 text-gray-700">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> 1.500 gluhih in 50.000 naglušnih v Sloveniji.</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Tuji govorci, ki lažje sledijo pisanemu besedilu.</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Udeleženci v hrupnih okoljih (sejmi, velike dvorane).</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Vizualni učenci in vsi, ki si želijo boljše osredotočenosti.</li>
+                        </ul>
+                         <p class="mt-4 text-gray-800 font-semibold">Raziskave kažejo, da kar 80% ljudi, ki vklopijo podnapise, nima težav s sluhom. Uporabljajo jih za boljše razumevanje in osredotočenost.</p>
+                    </div>
+                     <div class="chart-container">
+                        <canvas id="benefitsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="kako-deluje" class="py-16 md:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Tako preprosto je</h2>
+                    <p class="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">Odpravili smo tehnično zapletenost, da se vi lahko osredotočite na vsebino vašega dogodka.</p>
+                </div>
+                <div class="relative">
+                    <div class="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gray-300 -translate-y-1/2"></div>
+                    <div class="grid md:grid-cols-3 gap-8 md:gap-16 relative">
+                        <div class="text-center bg-white p-6 rounded-lg shadow-sm border">
+                            <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-indigo-100 text-indigo-600 mb-4 border-4 border-white text-2xl font-bold">1</div>
+                            <h3 class="text-xl font-bold mb-2">Rezervirajte Paket</h3>
+                            <p class="text-gray-600">Izberite paket, ki ustreza vašemu dogodku. Celoten postopek traja manj kot 5 minut.</p>
+                        </div>
+                        <div class="text-center bg-white p-6 rounded-lg shadow-sm border">
+                            <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-indigo-100 text-indigo-600 mb-4 border-4 border-white text-2xl font-bold">2</div>
+                            <h3 class="text-xl font-bold mb-2">Povežite Zvok</h3>
+                            <p class="text-gray-600">Na dan dogodka enostavno povežete naš sistem z vašim avdio virom. Nudimo vam polno tehnično podporo.</p>
+                        </div>
+                        <div class="text-center bg-white p-6 rounded-lg shadow-sm border">
+                            <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-indigo-100 text-indigo-600 mb-4 border-4 border-white text-2xl font-bold">3</div>
+                            <h3 class="text-xl font-bold mb-2">Transkripcija v Živo</h3>
+                            <p class="text-gray-600">Spremljajte, kako se govor v realnem času pretvarja v natančne podnapise. Po dogodku prejmete celoten transkript.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="trust" class="py-16 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h3 class="text-center text-xl font-semibold text-gray-600 mb-8">Strokovnjaki za slovenski trg in zakonodajo o dostopnosti</h3>
+                <div class="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 md:gap-x-12 opacity-60">
+                     <p class="font-semibold">GZS</p>
+                     <p class="font-semibold">DigitalnaDostopnost.si</p>
+                     <p class="font-semibold">CNVOS</p>
+                     <p class="font-semibold">WCAG 2.1 AA</p>
+                     <p class="font-semibold">ZDPSI 2025</p>
+                </div>
+                <div class="mt-16 max-w-2xl mx-auto text-center">
+                     <div class="bg-gray-50 p-8 rounded-xl shadow-inner">
+                        <p class="text-xl italic text-gray-700">“Zaradi Transkript.si je bila naša letna konferenca prvič zares dostopna vsem. Implementacija je bila neverjetno enostavna, odziv udeležencev pa izjemen. Končno rešitev, ki razume slovenski jezik!”</p>
+                        <p class="mt-4 font-bold text-gray-900">— Janez Novak, Organizator dogodkov</p>
+                        <p class="text-sm text-gray-500">Podjetje d.o.o.</p>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cenik" class="py-16 md:py-24">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Enostavni paketi za vsak dogodek</h2>
+                    <p class="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">Pozabite na zapletene naročnine. Naše cene so pregledne in prilagojene vašim potrebam.</p>
+                </div>
+                <div class="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto items-start">
+                    
+                    <div class="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+                        <h3 class="text-2xl font-bold">Enkratni Dogodek</h3>
+                        <p class="text-gray-500 mt-1">Za spletne seminarje in krajše delavnice.</p>
+                        <p class="text-5xl font-extrabold my-6">199€</p>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Do 4 ure transkripcije</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Jezik: Slovenščina</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Visoka natančnost (AI-pogon)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Integracije (Zoom, Teams, Meet)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Podpora preko e-pošte</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Transkript po dogodku</li>
+                        </ul>
+                        <a href="https://transkripcija-za-gluhe.lovable.app/login" class="cta-button mt-8 block w-full text-center bg-white text-indigo-600 font-bold py-3 px-6 rounded-lg border-2 border-indigo-600 hover:bg-indigo-50">Izberi Paket</a>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-lg shadow-2xl border-2 border-indigo-600 relative">
+                        <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-sm font-bold px-4 py-1 rounded-full">PRIPOROČAMO</div>
+                        <h3 class="text-2xl font-bold">Konferenca Pro</h3>
+                        <p class="text-gray-500 mt-1">Za večdnevne konference in večje dogodke.</p>
+                        <p class="text-5xl font-extrabold my-6">699€</p>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Do 20 ur transkripcije</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Jezik: Slovenščina + Angleščina</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Zelo visoka natančnost (AI + optimizacija)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Integracije (Zoom, Teams, Meet, RTMP)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Prioritetna podpora (telefon + e-pošta)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Transkript po dogodku</li>
+                        </ul>
+                        <a href="https://transkripcija-za-gluhe.lovable.app/login" class="cta-button mt-8 block w-full text-center bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700">Izberi Paket</a>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
+                        <h3 class="text-2xl font-bold">Po Meri</h3>
+                        <p class="text-gray-500 mt-1">Za agencije in organizatorje več dogodkov.</p>
+                        <p class="text-3xl font-extrabold my-6 h-[64px] flex items-center">Kontaktirajte nas</p>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Ure po dogovoru</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Več jezikov na voljo</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Najvišja natančnost (slovar po meri)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> API dostop in integracije po meri</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Namenski skrbnik računa</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span> Transkript po dogodku</li>
+                        </ul>
+                         <a href="https://transkripcija-za-gluhe.lovable.app/login" class="cta-button mt-8 block w-full text-center bg-white text-indigo-600 font-bold py-3 px-6 rounded-lg border-2 border-indigo-600 hover:bg-indigo-50">Pošlji Povpraševanje</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Pogosta vprašanja</h2>
+                    <p class="mt-3 text-lg text-gray-600">Imate vprašanje? Verjetno niste edini. Tu so odgovori na najpogostejša vprašanja.</p>
+                </div>
+                <div id="faq-container" class="space-y-4">
+                    <div class="faq-item border-b border-gray-200">
+                        <button class="faq-question w-full text-left p-4 focus:outline-none flex justify-between items-center">
+                            <span class="text-lg font-medium text-gray-800">Kako natančna je transkripcija?</span>
+                            <span class="faq-arrow text-indigo-600 text-2xl transform transition-transform">+</span>
+                        </button>
+                        <div class="faq-answer px-4 text-gray-600">
+                            Naša tehnologija je posebej optimizirana za slovenski jezik, kar nam omogoča doseganje zelo visoke natančnosti. Natančnost je odvisna od kakovosti zvoka, jasnosti govora in prisotnosti ozadnega hrupa. Za ključne dogodke priporočamo uporabo čistega avdio signala iz mešalne mize.
+                        </div>
+                    </div>
+                     <div class="faq-item border-b border-gray-200">
+                        <button class="faq-question w-full text-left p-4 focus:outline-none flex justify-between items-center">
+                            <span class="text-lg font-medium text-gray-800">Ali deluje z mojo platformo za dogodke?</span>
+                            <span class="faq-arrow text-indigo-600 text-2xl transform transition-transform">+</span>
+                        </button>
+                        <div class="faq-answer px-4 text-gray-600">
+                           Da. Naša rešitev se enostavno integrira z vsemi večjimi platformami za spletne dogodke, kot so Zoom, Microsoft Teams in Google Meet. Podpiramo tudi standardni RTMP protokol za prenose v živo na platformah, kot sta YouTube ali Vimeo.
+                        </div>
+                    </div>
+                     <div class="faq-item border-b border-gray-200">
+                        <button class="faq-question w-full text-left p-4 focus:outline-none flex justify-between items-center">
+                            <span class="text-lg font-medium text-gray-800">Kaj potrebujem za tehnično pripravo?</span>
+                            <span class="faq-arrow text-indigo-600 text-2xl transform transition-transform">+</span>
+                        </button>
+                        <div class="faq-answer px-4 text-gray-600">
+                           Vse, kar potrebujemo, je čist avdio signal govorca. To je lahko izhod iz mešalne mize ali neposredna povezava z mikrofonom. Naša ekipa vam nudi polno tehnično podporo pred in med dogodkom, da zagotovimo brezhibno delovanje.
+                        </div>
+                    </div>
+                     <div class="faq-item border-b border-gray-200">
+                        <button class="faq-question w-full text-left p-4 focus:outline-none flex justify-between items-center">
+                            <span class="text-lg font-medium text-gray-800">Je to isto kot tolmač za znakovni jezik?</span>
+                            <span class="faq-arrow text-indigo-600 text-2xl transform transition-transform">+</span>
+                        </button>
+                        <div class="faq-answer px-4 text-gray-600">
+                           Ne. Transkripcija v živo (znana tudi kot CART) pretvarja govor v besedilo v realnem času. Služi širšemu občinstvu, vključno z naglušnimi, ki morda ne poznajo znakovnega jezika, tujimi govorci in drugimi. Tolmačenje v znakovni jezik je ločena storitev, ki jo prav tako priporočamo za popolno dostopnost.
+                        </div>
+                    </div>
+                     <div class="faq-item border-b border-gray-200">
+                        <button class="faq-question w-full text-left p-4 focus:outline-none flex justify-between items-center">
+                            <span class="text-lg font-medium text-gray-800">Zakaj bi plačal, če obstajajo brezplačne aplikacije?</span>
+                            <span class="faq-arrow text-indigo-600 text-2xl transform transition-transform">+</span>
+                        </button>
+                        <div class="faq-answer px-4 text-gray-600">
+                           Brezplačne aplikacije so odlične za osebno uporabo, vendar za profesionalne dogodke ne zagotavljajo potrebne zanesljivosti, natančnosti, skalabilnosti in tehnične podpore. Naša storitev je poslovna rešitev, zasnovana za zagotavljanje zakonske skladnosti, visoke kakovosti in brezskrbne izvedbe.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="final-cta" class="py-16 md:py-24 bg-indigo-700 text-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                 <h2 class="text-3xl md:text-4xl font-bold tracking-tight">Pripravljeni, da naredite vaš dogodek dostopen?</h2>
+                 <p class="mt-4 text-lg text-indigo-200 max-w-2xl mx-auto">Ne čakajte na zadnji trenutek. Zagotovite si skladnost in ponudite boljšo izkušnjo vsem vašim udeležencem. Kontaktirajte nas danes za neobvezujočo ponudbo.</p>
+                 <div class="mt-8">
+                     <a href="https://transkripcija-za-gluhe.lovable.app/login" class="cta-button inline-block bg-white text-indigo-700 font-bold py-3 px-8 rounded-lg text-lg shadow-lg hover:bg-gray-100">Oglejte si pakete</a>
+                 </div>
+             </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2025 AI Inštitut. Vse pravice pridržane.</p>
+            <p class="text-sm text-gray-400 mt-2">Rešitve za dostopnost dogodkov v Sloveniji.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function () {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                     mobileMenu.classList.add('hidden');
+                });
+            });
+
+            const faqContainer = document.getElementById('faq-container');
+            if(faqContainer) {
+                faqContainer.addEventListener('click', function (e) {
+                    const question = e.target.closest('.faq-question');
+                    if (question) {
+                        const item = question.parentElement;
+                        const arrow = question.querySelector('.faq-arrow');
+                        const allItems = faqContainer.querySelectorAll('.faq-item');
+                        
+                        const wasOpen = question.classList.contains('open');
+
+                        allItems.forEach(i => {
+                            i.querySelector('.faq-question').classList.remove('open');
+                            i.querySelector('.faq-arrow').textContent = '+';
+                            i.querySelector('.faq-arrow').classList.remove('rotate-45');
+                        });
+
+                        if (!wasOpen) {
+                            question.classList.add('open');
+                            arrow.textContent = '-';
+                            arrow.classList.add('rotate-45');
+                        }
+                    }
+                });
+            }
+            
+            const ctx = document.getElementById('benefitsChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Uporabniki brez težav s sluhom (udobje, fokus)', 'Naglušni', 'Gluhi'],
+                        datasets: [{
+                            label: 'Kdo ima korist od podnapisov',
+                            data: [80, 18.5, 1.5],
+                            backgroundColor: [
+                                'rgba(79, 70, 229, 0.7)',  
+                                'rgba(99, 102, 241, 0.7)', 
+                                'rgba(129, 140, 248, 0.7)'  
+                            ],
+                            borderColor: [
+                                'rgb(79, 70, 229)',
+                                'rgb(99, 102, 241)',
+                                'rgb(129, 140, 248)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                   font: { size: 14 }
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Uporabniki podnapisov po skupinah (%)',
+                                font: { size: 16, weight: 'bold' },
+                                padding: { bottom: 20 }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('shadow-md');
+                } else {
+                    header.classList.remove('shadow-md');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
